@@ -1,87 +1,88 @@
-#include<iostream>
-
+#include <iostream>
+#include <vector>
 using namespace std;
 
-class heap {
+class max_heap{
 	public:
-    	int q[1000];  
-    	
-    	heap() {
-        	q[0] = 0;  
-    	}
-    
-    void insert(int n) {
-        if (q[0] < 999) {  
-            q[0] = q[0] + 1;  
-            q[q[0]] = n;  
-            int i = q[0];
-   
-            while (i > 1 && q[i/2] < q[i]) {
-                int t = q[i/2];
-                q[i/2] = q[i];
-                q[i] = t;
-                i = i/2;  
-            }
-        }
-    }
-
-    int Delete(){
-        if(q[0] > 0){
-            int maxVal = q[1];
-            q[1] = q[q[0]]; 
-            q[0]--;  
-
-            int p = 1;
-            while (p <= q[0]) {
-                int l = p*2;
-                int r = (p*2) + 1;
-                int largest = p;
-
-                if (l <= q[0] && q[l] > q[largest]) {
-                    largest = l;
-                }
-                if (r <= q[0] && q[r] > q[largest]) {
-                    largest = r;
-                }
-                if (largest != p) {
-                    int t = q[largest];
-                    q[largest] = q[p];
-                    q[p] = t;
-                    p = largest;
-                } else {
-                    break;
-                }
-            }
-            cout<<maxVal<<endl;
-            return maxVal;
-        }return -1;  
-    }
-
-    void print() {
-    	if(q[0] > 0){
-    		for(int i = 1; i <= q[0]; i++){
-            	cout<<q[i]<< " ";
-        	}cout<<endl;
-				}
-    }
+		vector<int> heap;
+		
+	void heapify_up(int index){
+		if(index && heap[parent(index)] < heap[index]){
+			swap(heap[index],heap[parent(index)]);
+			heapify_up(parent(index));
+		}
+	}
+	
+	void heapify_down(int index){
+		int left = left_child(index);
+		int right = right_child(index);
+		int largest = index;
+		
+		if(left < heap.size() && heap[left] > heap[largest]){
+			largest = left;
+		}
+		if(right < heap.size() && heap[right] > heap[largest]){
+			largest = right;
+		}
+		if(largest != index){
+			swap(heap[index],heap[largest]);
+			heapify_down(largest);
+		}
+		
+	}
+	
+	void add(int data){
+		heap.push_back(data);
+		heapify_up(heap.size() - 1);
+	}
+	
+	void remove(){
+		if(!heap.empty()){
+			int remove_data = heap[0];
+			heap[0] = heap.back();
+			heap.pop_back();
+			heapify_down(0);
+			cout<<remove_data<<endl;
+		}
+	}
+	
+	int print(){
+		if(!heap.empty()){
+			for(int i=0;i<heap.size();i++){
+				cout<<heap[i]<<" ";
+			}cout<<endl;
+		}
+	}
+	
+	int parent(int index){
+		return (index - 1) / 2;
+	}
+	
+	int left_child(int index){
+		return 2 * index + 1;
+	}
+	
+	int right_child(int index){
+		return 2 * index + 2;
+	}
 };
 
-int main() {
-    heap h;
-    char cmp;
-    int n;
-    do{
-    	cin>>cmp;
-		if(cmp =='a'){
-			cin>>n;
-			h.insert(n);
-		}else if(cmp =='p'){
-			h.print();
-		}else if(cmp =='d'){
-			h.Delete();
-		}
-		else{
-			return 0;
+int main(){
+	max_heap heap;
+	char cmp;
+	int data;
+	
+	do{
+		cin>>cmp;
+		if(cmp == 'a'){
+			cin>>data;
+			heap.add(data);
+		}else if(cmp == 'p'){
+			heap.print();
+		}else if(cmp == 'd'){
+			heap.remove();
 		}
 	}while(cmp != 'e');
+	
+	return 0;
 }
